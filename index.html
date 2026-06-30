@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
+    <title>Al-Hasnain Online Academy | Authentic Islamic Education</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=Amiri:wght@400;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: { primary: "#047857", secondary: "#D97706", surface: "#f8fafc" },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
+            --shadow-soft: 0 18px 60px rgba(15,23,42,.08);
+            --shadow-lift: 0 26px 80px rgba(4,120,87,.16);
+        }
+        * { -webkit-tap-highlight-color: transparent; }
+        html { scroll-padding-top: 88px; }
+        body { opacity:0; transition:opacity .7s var(--ease-premium); }
+        body.is-loaded { opacity:1; }
+        body::before {
+            content:"";
+            position:fixed;
+            inset:0;
+            pointer-events:none;
+            z-index:0;
+            background:
+                radial-gradient(circle at 18% 12%, rgba(4,120,87,.08), transparent 28%),
+                radial-gradient(circle at 82% 18%, rgba(217,119,6,.07), transparent 26%),
+                linear-gradient(180deg, rgba(255,255,255,.86), rgba(248,250,252,.6));
+        }
+        main, footer, header, .nav-bot, .cursor-light { position:relative; }
+        main, footer, header, .nav-bot { z-index:1; }
+        button, a, input, select { transition-timing-function: var(--ease-premium) !important; }
+        button, a { -webkit-font-smoothing: antialiased; }
+        .arabic { font-family: 'Amiri', serif; direction: rtl; line-height: 1.9; }
+        .geo {
+            position:relative;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l2.5 7.5L40 10l-7.5 2.5L30 20l-2.5-7.5L20 10l7.5-2.5L30 0zm0 40l2.5 7.5L40 50l-7.5 2.5L30 60l-2.5-7.5L20 50l7.5-2.5L30 40z' fill='%23047857' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
+            isolation:isolate;
+        }
+        .geo::before, #features::before, #teachers::before {
+            content:"";
+            position:absolute;
+            pointer-events:none;
+            z-index:-1;
+            width:min(42vw,520px);
+            height:min(42vw,520px);
+            border-radius:999px;
+            filter:blur(54px);
+            opacity:.42;
+            transform:translate3d(0,0,0);
+            animation: gradientDrift 14s var(--ease-premium) infinite alternate;
+        }
+        .geo::before { top:8%; right:-16%; background:linear-gradient(135deg, rgba(16,185,129,.22), rgba(245,158,11,.12)); }
+        #features, #teachers { position:relative; isolation:isolate; }
+        #features::before { left:-18%; top:16%; background:linear-gradient(135deg, rgba(4,120,87,.12), rgba(255,255,255,0)); }
+        #teachers::before { right:-18%; top:22%; background:linear-gradient(135deg, rgba(236,72,153,.11), rgba(4,120,87,.08)); }
+        .sacred, .premium-card {
+            box-shadow:0 12px 44px rgba(15,23,42,.06);
+            transition:box-shadow .65s var(--ease-premium), transform .65s var(--ease-premium), border-color .65s var(--ease-premium), background-color .65s var(--ease-premium);
+            will-change:transform;
+            transform:translateZ(0);
+        }
+        .sacred:hover, .premium-card:hover {
+            box-shadow:var(--shadow-lift);
+            transform:translateY(-7px) scale(1.01);
+        }
+        .reveal {
+            opacity:0;
+            transform:translate3d(0,34px,0) scale(.985);
+            filter:blur(8px);
+            transition:opacity .8s var(--ease-premium), transform .8s var(--ease-premium), filter .8s var(--ease-premium);
+            will-change:opacity, transform, filter;
+        }
+        .reveal.active { opacity:1; transform:translate3d(0,0,0) scale(1); filter:blur(0); }
+        .glass {
+            background:rgba(255,255,255,.76);
+            backdrop-filter:blur(22px) saturate(170%);
+            -webkit-backdrop-filter:blur(22px) saturate(170%);
+            transition:background-color .45s var(--ease-premium), box-shadow .45s var(--ease-premium), border-color .45s var(--ease-premium), transform .45s var(--ease-premium);
+        }
+        .glass.nav-scrolled {
+            background:rgba(255,255,255,.88);
+            border-color:rgba(4,120,87,.16);
+            box-shadow:0 12px 40px rgba(15,23,42,.08);
+        }
+
+        /* Modal Fixes */
+        .modal-overlay {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: all 0.4s ease-in-out;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+        .modal-content {
+            opacity: 0;
+            transform: scale(0.9) translateY(20px);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .modal-overlay.active .modal-content {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+        /* Custom Scrollbar for form */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+        .card-img { overflow:hidden; transform:translateZ(0); }
+        .card-img img { transition:transform .9s var(--ease-premium), filter .9s var(--ease-premium); will-change:transform; }
+        .card-img:hover img, .sacred:hover .card-img img { transform:scale(1.045); filter:saturate(1.04) contrast(1.02); }
+        .fac { position:relative; background:#ecfdf5; display:flex; align-items:center; justify-content:center; overflow:hidden; transition:transform .65s var(--ease-premium), box-shadow .65s var(--ease-premium), border-color .65s var(--ease-premium); }
+        .fac img { width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; z-index:10; transition:transform .8s var(--ease-premium); }
+        .group:hover .fac img { transform:scale(1.055); }
+        .fac span { position:absolute; z-index:5; }
+        .fac-f { background:#fdf4ff !important; }
+        .fac-f > span { color:#e879f9 !important; }
+        .nav-bot {
+            box-shadow:0 -12px 34px rgba(15,23,42,.09);
+            background:rgba(255,255,255,.9);
+            backdrop-filter:blur(18px) saturate(160%);
+            -webkit-backdrop-filter:blur(18px) saturate(160%);
+        }
+        .nav-item { transition:color .35s var(--ease-premium), transform .35s var(--ease-premium); }
+        .nav-item:hover { transform:translateY(-2px); }
+        .nav-item.active { color:#047857; }
+        .nav-item.active .material-symbols-outlined { font-variation-settings:'FILL' 1; }
+        .divbar {
+            width:60px;
+            height:4px;
+            background:linear-gradient(90deg,#047857,#D97706);
+            border-radius:99px;
+            margin:0 auto;
+            box-shadow:0 8px 22px rgba(4,120,87,.18);
+            transform-origin:center;
+            animation: barIn .9s var(--ease-premium) both;
+        }
+        .female-header { background:linear-gradient(135deg,rgba(253,244,255,.92),rgba(252,231,243,.76)); border:1px solid #f5d0fe; border-radius:1rem; box-shadow:0 18px 48px rgba(236,72,153,.08); }
+        .premium-button, [data-magnetic] {
+            position:relative;
+            overflow:hidden;
+            transform:translateZ(0);
+            will-change:transform;
+            transition:transform .45s var(--ease-premium), box-shadow .45s var(--ease-premium), background-color .45s var(--ease-premium), color .45s var(--ease-premium);
+        }
+        .premium-button::after, [data-magnetic]::after {
+            content:"";
+            position:absolute;
+            inset:-1px;
+            background:linear-gradient(115deg, transparent 0%, rgba(255,255,255,.28) 42%, transparent 70%);
+            transform:translateX(-120%);
+            transition:transform .75s var(--ease-premium);
+            pointer-events:none;
+        }
+        .premium-button:hover::after, [data-magnetic]:hover::after { transform:translateX(120%); }
+        .premium-button:hover, [data-magnetic]:hover { box-shadow:0 20px 48px rgba(4,120,87,.22); }
+        .cursor-light {
+            position:fixed;
+            left:0;
+            top:0;
+            width:360px;
+            height:360px;
+            border-radius:999px;
+            pointer-events:none;
+            z-index:2;
+            opacity:0;
+            transform:translate3d(-50%,-50%,0);
+            background:radial-gradient(circle, rgba(4,120,87,.105), rgba(217,119,6,.045) 34%, transparent 68%);
+            filter:blur(8px);
+            transition:opacity .45s var(--ease-premium);
+            mix-blend-mode:multiply;
+        }
+        .cursor-light.active { opacity:1; }
+        @keyframes gradientDrift {
+            0% { transform:translate3d(0,0,0) scale(1); }
+            100% { transform:translate3d(-24px,28px,0) scale(1.08); }
+        }
+        @keyframes barIn {
+            from { opacity:0; transform:scaleX(.35); }
+            to { opacity:1; transform:scaleX(1); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration:.01ms !important;
+                animation-iteration-count:1 !important;
+                scroll-behavior:auto !important;
+                transition-duration:.01ms !important;
+            }
+            .reveal { opacity:1; transform:none; filter:none; }
+            body { opacity:1; }
+            .cursor-light { display:none; }
+        }
+        @media (max-width: 767px) {
+            .cursor-light { display:none; }
+            .sacred:hover, .premium-card:hover { transform:translateY(-3px) scale(1.005); }
+        }
+    </style>
+</head>
+<body class="bg-surface font-['Inter'] text-zinc-800 selection:bg-emerald-200 selection:text-emerald-900 overflow-x-hidden pb-20 md:pb-0">
+<div class="cursor-light" id="cursor-light"></div>
+
+<header class="glass border-b border-emerald-100/50 fixed w-full top-0 z-50 shadow-sm" id="site-header">
+  <nav class="flex justify-between items-center px-4 md:px-6 py-3 md:py-4 max-w-7xl mx-auto">
+    <div class="text-lg md:text-xl font-extrabold text-emerald-800 flex items-center gap-2 group cursor-pointer" onclick="window.scrollTo(0,0)">
+      <img src="./openart-image_1778147717880_453b4acf_1778147717990_97f5b890.png" alt="Logo" class="h-8 w-8 md:h-10 md:w-10 object-contain rounded-full shadow-sm group-hover:scale-110 transition-transform duration-500"/>
+      Al-Hasnain Academy
+    </div>
+    <div class="hidden md:flex items-center gap-8 font-semibold text-sm">
+      <a class="relative hover:text-emerald-600 transition-colors after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-emerald-600 after:transition-all hover:after:w-full" href="#courses">Courses</a>
+      <a class="relative hover:text-emerald-600 transition-colors after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-emerald-600 after:transition-all hover:after:w-full" href="#teachers">Teachers</a>
+      <a class="relative hover:text-emerald-600 transition-colors after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-emerald-600 after:transition-all hover:after:w-full" href="#features">Benefits</a>
+      <a class="relative hover:text-emerald-600 transition-colors after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-emerald-600 after:transition-all hover:after:w-full" href="#hero">About</a>
+    </div>
+  </nav>
+</header>
+
+<div class="md:hidden fixed bottom-0 left-0 right-0 bg-white z-[60] flex justify-around items-center py-2 px-4 nav-bot rounded-t-3xl border-t border-emerald-50">
+  <a href="#hero" class="nav-item active flex flex-col items-center p-2 text-emerald-800 transition-colors" onclick="setNav(this)">
+    <span class="material-symbols-outlined text-2xl mb-0.5" style="font-variation-settings:'FILL' 1">home</span>
+    <span class="text-[10px] font-extrabold">Home</span>
+  </a>
+  <a href="#courses" class="nav-item flex flex-col items-center p-2 text-zinc-400 hover:text-emerald-600 transition-colors" onclick="setNav(this)">
+    <span class="material-symbols-outlined text-2xl mb-0.5">menu_book</span>
+    <span class="text-[10px] font-bold">Courses</span>
+  </a>
+  <a href="#teachers" class="nav-item flex flex-col items-center p-2 text-zinc-400 hover:text-emerald-600 transition-colors" onclick="setNav(this)">
+    <span class="material-symbols-outlined text-2xl mb-0.5">groups</span>
+    <span class="text-[10px] font-bold">Teachers</span>
+  </a>
+  <button onclick="window.open('https://wa.me/923073741024','_blank')" class="flex flex-col items-center p-2 text-zinc-400 hover:text-emerald-600 transition-colors">
+    <svg class="w-6 h-6 mb-0.5" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    <span class="text-[10px] font-bold">Contact</span>
+  </button>
+</div>
+
+<main class="pt-16 md:pt-20">
+
+<section class="relative min-h-[85vh] md:min-h-[90vh] flex items-center geo px-4 md:px-6 overflow-hidden" id="hero">
+  <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-8 md:gap-12 items-center relative z-10 py-8 md:py-12">
+    <div class="space-y-6 md:space-y-8 reveal active text-center lg:text-left">
+      <div class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-700 rounded-full text-[10px] md:text-xs font-bold tracking-widest uppercase border border-emerald-100 shadow-sm cursor-default">
+        <span class="material-symbols-outlined text-sm">verified</span> Established Since 2018
+      </div>
+      <h1 class="text-4xl md:text-5xl lg:text-7xl font-extrabold text-zinc-900 leading-[1.15] font-['Manrope']">
+        Authentic Islamic Learning <span class="text-emerald-700 inline-block hover:scale-105 transition-transform cursor-default">Online.</span>
+      </h1>
+      <p class="text-base md:text-lg text-zinc-600 max-w-lg mx-auto lg:mx-0 leading-relaxed">
+        Join our growing global community. Get authentic Quranic and Islamic education in English and Arabic under certified scholars - from the comfort of your home.
+      </p>
+      <div class="flex flex-wrap justify-center lg:justify-start gap-4 pt-2 md:pt-4">
+        <button onclick="window.location.href='#courses'" data-magnetic class="premium-button w-full md:w-auto bg-emerald-700 text-white px-8 py-4 rounded-2xl font-bold text-lg hover:bg-emerald-800 shadow-xl shadow-emerald-700/20 active:scale-95 transition-all flex items-center justify-center gap-2 group">
+          Start Your Journey <span class="material-symbols-outlined group-hover:translate-x-2 transition-transform duration-300">arrow_forward</span>
+        </button>
+      </div>
+    </div>
+    <div class="relative reveal active mt-6 lg:mt-0">
+      <div class="absolute inset-0 bg-emerald-600 rounded-[2rem] rotate-3 opacity-10"></div>
+      <div class="absolute inset-0 bg-amber-500 rounded-[2rem] -rotate-3 opacity-10"></div>
+      <div class="card-img rounded-[2rem] shadow-2xl relative z-10 border-4 border-white">
+        <img src="./WhatsApp Image 2026-05-07 at 15.02.15.jpeg" class="w-full aspect-[4/3] object-cover" alt="Online Quran Study">
+      </div>
+      <div class="absolute -bottom-6 -left-4 md:-bottom-8 md:-left-8 bg-white/90 backdrop-blur-xl p-4 md:p-6 rounded-2xl sacred z-20 flex items-center gap-3 scale-90 md:scale-100">
+        <div class="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600">
+          <span class="material-symbols-outlined text-2xl">public</span>
+        </div>
+        <div>
+          <p class="font-extrabold text-lg leading-none text-zinc-900">Global</p>
+          <p class="text-xs text-zinc-500 font-medium">Growing Community</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-16 md:py-24 bg-white" id="features">
+  <div class="max-w-7xl mx-auto px-4 md:px-6">
+    <div class="text-center mb-12 md:mb-16 reveal">
+      <h2 class="text-3xl md:text-4xl font-extrabold text-zinc-900 font-['Manrope']">Why Choose Us?</h2>
+      <div class="divbar mt-4"></div>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+      <div class="bg-surface p-6 md:p-8 rounded-3xl sacred border border-zinc-100 cursor-default group reveal">
+        <div class="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 mb-6 group-hover:-translate-y-2 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500"><span class="material-symbols-outlined text-3xl">translate</span></div>
+        <h3 class="text-xl font-bold mb-3 text-zinc-900">English &amp; Arabic</h3>
+        <p class="text-sm text-zinc-600 leading-relaxed">Personalized learning in English and Arabic for complete understanding.</p>
+      </div>
+      <div class="bg-surface p-6 md:p-8 rounded-3xl sacred border border-zinc-100 cursor-default group reveal" style="transition-delay:100ms">
+        <div class="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 mb-6 group-hover:-translate-y-2 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500"><span class="material-symbols-outlined text-3xl">workspace_premium</span></div>
+        <h3 class="text-xl font-bold mb-3 text-zinc-900">Certified Courses</h3>
+        <p class="text-sm text-zinc-600 leading-relaxed">Receive formal certification and Dastar-e-Fazeelat upon completing major courses.</p>
+      </div>
+      <div class="bg-surface p-6 md:p-8 rounded-3xl sacred border border-zinc-100 cursor-default group reveal" style="transition-delay:200ms">
+        <div class="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 mb-6 group-hover:-translate-y-2 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500"><span class="material-symbols-outlined text-3xl">schedule</span></div>
+        <h3 class="text-xl font-bold mb-3 text-zinc-900">Flexible Timings</h3>
+        <p class="text-sm text-zinc-600 leading-relaxed">Classes tailored to your schedule, perfectly suited for international students.</p>
+      </div>
+      <div class="bg-surface p-6 md:p-8 rounded-3xl sacred border border-zinc-100 cursor-default group reveal" style="transition-delay:300ms">
+        <div class="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 mb-6 group-hover:-translate-y-2 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500"><span class="material-symbols-outlined text-3xl">diversity_3</span></div>
+        <h3 class="text-xl font-bold mb-3 text-zinc-900">Expert Consultations</h3>
+        <p class="text-sm text-zinc-600 leading-relaxed">Direct access to qualified Ulema for guidance on religious and worldly matters.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-16 md:py-24 geo" id="courses">
+  <div class="max-w-7xl mx-auto px-4 md:px-6">
+    <div class="text-center mb-12 md:mb-16 reveal">
+      <h2 class="text-3xl md:text-4xl font-extrabold text-zinc-900 font-['Manrope']">Our Curriculum</h2>
+      <p class="text-zinc-500 max-w-2xl mx-auto mt-2">Structured courses for deep Quranic and Islamic understanding.</p>
+      <div class="divbar mt-4"></div>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6" id="courses-grid"></div>
+  </div>
+</section>
+
+<section class="py-16 md:py-24 bg-white" id="teachers">
+  <div class="max-w-7xl mx-auto px-4 md:px-6">
+    <div class="text-center mb-12 md:mb-16 reveal">
+      <p class="text-emerald-700 font-bold tracking-widest text-xs uppercase">Our Faculty</p>
+      <h2 class="text-3xl md:text-4xl font-extrabold text-zinc-900 font-['Manrope'] mt-2">Meet Our Teachers</h2>
+      <div class="divbar mt-4"></div>
+    </div>
+
+    <div class="mb-14">
+      <div class="flex justify-center mb-8">
+        <div class="inline-flex items-center gap-2 px-5 py-2 bg-emerald-50 border border-emerald-200 rounded-full text-emerald-700 font-bold text-sm">
+          <span class="material-symbols-outlined text-base">school</span> Male Faculty
+        </div>
+      </div>
+      <div class="flex flex-wrap justify-center gap-6 md:gap-8">
+        <div class="w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] bg-white rounded-3xl p-6 sacred border border-zinc-100 text-center group reveal">
+          <div class="fac w-28 h-28 md:w-36 md:h-36 mx-auto rounded-full mb-4 border-4 border-emerald-100 shadow-sm group-hover:-translate-y-3 transition-all duration-500">
+            <span class="material-symbols-outlined text-5xl text-emerald-300">person</span>
+          </div>
+          <h4 class="font-bold text-lg text-zinc-900 group-hover:text-emerald-700 transition-colors">Hafiz Syed Dildar Hussain</h4>
+          <p class="text-emerald-600 font-bold text-xs uppercase tracking-wider mt-2">CEO &amp; Head of Team</p>
+          <p class="text-zinc-500 text-xs mt-1">Sharia Advisor</p>
+        </div>
+        <div class="w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] bg-white rounded-3xl p-6 sacred border border-zinc-100 text-center group reveal" style="transition-delay:100ms">
+          <div class="fac w-28 h-28 md:w-36 md:h-36 mx-auto rounded-full mb-4 border-4 border-emerald-100 shadow-sm group-hover:-translate-y-3 transition-all duration-500">
+            <span class="material-symbols-outlined text-5xl text-emerald-300">person</span>
+          </div>
+          <h4 class="font-bold text-lg text-zinc-900 group-hover:text-emerald-700 transition-colors">Maulana Syed Zubair</h4>
+          <p class="text-emerald-600 font-bold text-xs uppercase tracking-wider mt-2">Arabic Tutor</p>
+          <p class="text-zinc-500 text-xs mt-1">Grammar Expert</p>
+        </div>
+        <div class="w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] bg-white rounded-3xl p-6 sacred border border-zinc-100 text-center group reveal" style="transition-delay:200ms">
+          <div class="fac w-28 h-28 md:w-36 md:h-36 mx-auto rounded-full mb-4 border-4 border-emerald-100 shadow-sm group-hover:-translate-y-3 transition-all duration-500">
+            <span class="material-symbols-outlined text-5xl text-emerald-300">person</span>
+          </div>
+          <h4 class="font-bold text-lg text-zinc-900 group-hover:text-emerald-700 transition-colors">Hafiz Syed Atta Muhammad</h4>
+          <p class="text-emerald-600 font-bold text-xs uppercase tracking-wider mt-2">Tajweed Instructor</p>
+          <p class="text-zinc-500 text-xs mt-1">Quran Teacher</p>
+        </div>
+        <div class="w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] bg-white rounded-3xl p-6 sacred border border-zinc-100 text-center group reveal" style="transition-delay:300ms">
+          <div class="fac w-28 h-28 md:w-36 md:h-36 mx-auto rounded-full mb-4 border-4 border-emerald-100 shadow-sm group-hover:-translate-y-3 transition-all duration-500">
+            <span class="material-symbols-outlined text-5xl text-emerald-300">person</span>
+          </div>
+          <h4 class="font-bold text-lg text-zinc-900 group-hover:text-emerald-700 transition-colors">Hafiz Syed Rashid</h4>
+          <p class="text-emerald-600 font-bold text-xs uppercase tracking-wider mt-2">Quran Instructor</p>
+          <p class="text-zinc-500 text-xs mt-1">Online Tutor</p>
+        </div>
+        <div class="w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] bg-white rounded-3xl p-6 sacred border border-zinc-100 text-center group reveal" style="transition-delay:400ms">
+          <div class="fac w-28 h-28 md:w-36 md:h-36 mx-auto rounded-full mb-4 border-4 border-emerald-100 shadow-sm group-hover:-translate-y-3 transition-all duration-500">
+            <span class="material-symbols-outlined text-5xl text-emerald-300">person</span>
+          </div>
+          <h4 class="font-bold text-lg text-zinc-900 group-hover:text-emerald-700 transition-colors">Hafiz Syed Faizan</h4>
+          <p class="text-emerald-600 font-bold text-xs uppercase tracking-wider mt-2">Junior Tutor</p>
+          <p class="text-zinc-500 text-xs mt-1">Nazra &amp; Hifz</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12">
+      <div class="female-header p-4 mb-8 text-center">
+        <div class="inline-flex items-center gap-2 text-pink-700 font-bold text-sm">
+          <span class="material-symbols-outlined text-base">school</span> Female Faculty - For Female Students Only
+        </div>
+      </div>
+      <div class="flex flex-wrap justify-center gap-6 md:gap-8">
+
+        <div class="w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] bg-white rounded-3xl p-6 border border-pink-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-500 text-center group reveal">
+          <div class="fac fac-f w-28 h-28 md:w-36 md:h-36 mx-auto rounded-full mb-4 border-4 border-pink-100 shadow-sm group-hover:-translate-y-3 transition-all duration-500">
+            <span class="material-symbols-outlined text-5xl">person</span>
+          </div>
+          <h4 class="font-bold text-lg text-zinc-900 group-hover:text-pink-600 transition-colors">Umm Habiba</h4>
+          <p class="arabic text-base text-emerald-700 font-bold mt-1">أم حبيبة</p>
+          <p class="text-pink-500 font-bold text-xs uppercase tracking-wider mt-2">Female Quran Instructor</p>
+          <p class="text-zinc-400 text-xs mt-1">Nazra &amp; Tajweed</p>
+        </div>
+
+        <div class="w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] bg-white rounded-3xl p-6 border border-pink-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-500 text-center group reveal" style="transition-delay:100ms">
+          <div class="fac fac-f w-28 h-28 md:w-36 md:h-36 mx-auto rounded-full mb-4 border-4 border-pink-100 shadow-sm group-hover:-translate-y-3 transition-all duration-500">
+            <span class="material-symbols-outlined text-5xl">person</span>
+          </div>
+          <h4 class="font-bold text-lg text-zinc-900 group-hover:text-pink-600 transition-colors">Aisha</h4>
+          <p class="arabic text-base text-emerald-700 font-bold mt-1">عائشة</p>
+          <p class="text-pink-500 font-bold text-xs uppercase tracking-wider mt-2">Female Islamic Studies Teacher</p>
+          <p class="text-zinc-400 text-xs mt-1">Fiqh &amp; Islamic Beliefs</p>
+        </div>
+
+        <div class="w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] bg-white rounded-3xl p-6 border border-pink-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-500 text-center group reveal" style="transition-delay:200ms">
+          <div class="fac fac-f w-28 h-28 md:w-36 md:h-36 mx-auto rounded-full mb-4 border-4 border-pink-100 shadow-sm group-hover:-translate-y-3 transition-all duration-500">
+            <span class="material-symbols-outlined text-5xl">person</span>
+          </div>
+          <h4 class="font-bold text-lg text-zinc-900 group-hover:text-pink-600 transition-colors">Najma</h4>
+          <p class="arabic text-base text-emerald-700 font-bold mt-1">نجمة</p>
+          <p class="text-pink-500 font-bold text-xs uppercase tracking-wider mt-2">Female Quran Teacher</p>
+          <p class="text-zinc-400 text-xs mt-1">Hifz &amp; Quran Revision</p>
+        </div>
+
+        <div class="w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] bg-white rounded-3xl p-6 border border-pink-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-500 text-center group reveal" style="transition-delay:300ms">
+          <div class="fac fac-f w-28 h-28 md:w-36 md:h-36 mx-auto rounded-full mb-4 border-4 border-pink-100 shadow-sm group-hover:-translate-y-3 transition-all duration-500">
+            <span class="material-symbols-outlined text-5xl">person</span>
+          </div>
+          <h4 class="font-bold text-lg text-zinc-900 group-hover:text-pink-600 transition-colors">Umm Zahra</h4>
+          <p class="arabic text-base text-emerald-700 font-bold mt-1">أم زهراء</p>
+          <p class="text-pink-500 font-bold text-xs uppercase tracking-wider mt-2">Female Hifz Instructor</p>
+          <p class="text-zinc-400 text-xs mt-1">Hifz &amp; Quran Memorization</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="bg-zinc-950 text-white pt-16 md:pt-24 pb-12 border-t-4 border-emerald-700">
+  <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+    <div class="space-y-4">
+      <div class="text-xl font-extrabold text-white flex items-center gap-3 group cursor-pointer" onclick="window.scrollTo(0,0)">
+        <img src="./openart-image_1778147717880_453b4acf_1778147717990_97f5b890.png" alt="Logo" class="h-10 w-10 object-contain bg-white rounded-full p-0.5 group-hover:scale-110 transition-transform duration-500"/>
+        Al-Hasnain Academy
+      </div>
+      <p class="text-zinc-400 text-sm leading-relaxed">Dedicated to providing the highest quality online Islamic education for families worldwide.</p>
+    </div>
+    <div>
+      <h4 class="font-bold text-base mb-4 text-emerald-500">Quick Links</h4>
+      <ul class="space-y-3 text-sm text-zinc-400">
+        <li><a class="hover:text-white transition-all flex items-center gap-2" href="#courses"><span class="material-symbols-outlined text-sm">chevron_right</span>Courses</a></li>
+        <li><a class="hover:text-white transition-all flex items-center gap-2" href="#teachers"><span class="material-symbols-outlined text-sm">chevron_right</span>Teachers</a></li>
+        <li><a class="hover:text-white transition-all flex items-center gap-2" href="#features"><span class="material-symbols-outlined text-sm">chevron_right</span>Benefits</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="font-bold text-base mb-4 text-emerald-500">Contact</h4>
+      <ul class="space-y-3 text-sm text-zinc-400">
+        <li class="flex items-center gap-3"><span class="material-symbols-outlined text-emerald-500">call</span>+92 307 3741024</li>
+        <li class="flex items-center gap-3">
+          <svg class="w-5 h-5 text-emerald-500 shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 22v-8h2.7l.4-3.1h-3.1V8.9c0-.9.25-1.5 1.55-1.5h1.65V4.6c-.8-.09-1.61-.14-2.42-.14-2.4 0-4.05 1.47-4.05 4.16v2.32H8v3.1h2.73V22h2.77Z"/></svg>
+          <a href="https://www.facebook.com/share/17o8H7umUM/" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">Facebook Page</a>
+        </li>
+        <li class="flex items-center gap-3"><span class="material-symbols-outlined text-emerald-500">location_on</span>Online - Worldwide</li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="font-bold text-base mb-4 text-emerald-500">Connect</h4>
+      <div class="flex gap-4">
+        <a class="w-12 h-12 rounded-full bg-zinc-900 flex items-center justify-center hover:bg-emerald-600 transition-all" href="https://www.facebook.com/share/17o8H7umUM/" target="_blank" rel="noopener noreferrer" data-magnetic>
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 22v-8h2.7l.4-3.1h-3.1V8.9c0-.9.25-1.5 1.55-1.5h1.65V4.6c-.8-.09-1.61-.14-2.42-.14-2.4 0-4.05 1.47-4.05 4.16v2.32H8v3.1h2.73V22h2.77Z"/></svg>
+        </a>
+        <a class="w-12 h-12 rounded-full bg-zinc-900 flex items-center justify-center hover:bg-emerald-600 transition-all" href="https://wa.me/923073741024" target="_blank" rel="noopener noreferrer" data-magnetic>
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="max-w-7xl mx-auto px-6 pt-6 border-t border-zinc-800/50 text-center">
+    <p class="text-xs text-zinc-500">© 2026 Al-Hasnain Online Academy. All rights reserved.</p>
+  </div>
+</footer>
+
+<div class="fixed bottom-24 right-4 md:bottom-8 md:right-8 z-40">
+  <button onclick="window.open('https://wa.me/923073741024','_blank')" data-magnetic class="premium-button w-14 h-14 md:w-16 md:h-16 bg-[#25D366] text-white rounded-full flex items-center justify-center shadow-[0_10px_30px_rgba(37,211,102,0.4)] hover:bg-[#1ebe5d] hover:scale-105 transition-all duration-300 group">
+    <svg class="w-7 h-7 md:w-8 md:h-8" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  </button>
+</div>
+
+<div class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm modal-overlay" id="application-modal">
+    <div class="bg-white w-full max-w-2xl max-h-[85dvh] md:max-h-[85vh] min-h-0 rounded-3xl shadow-2xl modal-content flex flex-col overflow-hidden">
+
+        <div class="shrink-0 bg-gradient-to-r from-emerald-700 to-emerald-600 p-6 md:p-8 text-white flex justify-between items-center relative overflow-hidden rounded-t-3xl">
+            <div class="absolute right-0 top-0 opacity-10 transform translate-x-4 -translate-y-4 animate-pulse-slow">
+                <span class="material-symbols-outlined text-9xl">auto_stories</span>
+            </div>
+            <div class="relative z-10">
+                <h2 class="text-2xl md:text-3xl font-extrabold font-['Manrope']">Course Application</h2>
+                <p class="text-emerald-100 mt-2 text-sm">Fill out the details to begin your journey.</p>
+            </div>
+            <button class="relative z-10 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-all hover:rotate-90" onclick="closeModal()">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain p-6 md:p-8 bg-surface w-full custom-scrollbar">
+            <form class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6" id="admission-form">
+                <div class="space-y-2 group">
+                    <label class="font-bold text-sm text-zinc-700 group-focus-within:text-emerald-600 transition-colors">Student Name</label>
+                    <input class="w-full rounded-xl border-zinc-200 focus:border-emerald-500 focus:ring-emerald-500/20 bg-white transition-all shadow-sm hover:border-emerald-300" placeholder="Full name" type="text" required />
+                </div>
+                <div class="space-y-2 group">
+                    <label class="font-bold text-sm text-zinc-700 group-focus-within:text-emerald-600 transition-colors">Father Name</label>
+                    <input class="w-full rounded-xl border-zinc-200 focus:border-emerald-500 focus:ring-emerald-500/20 bg-white transition-all shadow-sm hover:border-emerald-300" placeholder="Guardian name" type="text" required />
+                </div>
+                <div class="space-y-2 group">
+                    <label class="font-bold text-sm text-zinc-700 group-focus-within:text-emerald-600 transition-colors">Age</label>
+                    <input class="w-full rounded-xl border-zinc-200 focus:border-emerald-500 focus:ring-emerald-500/20 bg-white transition-all shadow-sm hover:border-emerald-300" placeholder="Student age" type="number" required />
+                </div>
+                <div class="space-y-2 group">
+                    <label class="font-bold text-sm text-zinc-700 group-focus-within:text-emerald-600 transition-colors">CNIC / ID Number (Optional)</label>
+                    <input class="w-full rounded-xl border-zinc-200 focus:border-emerald-500 focus:ring-emerald-500/20 bg-white transition-all shadow-sm hover:border-emerald-300" placeholder="Identity number" type="text" />
+                </div>
+                <div class="space-y-2 group">
+                    <label class="font-bold text-sm text-zinc-700 group-focus-within:text-emerald-600 transition-colors">Country</label>
+                    <input class="w-full rounded-xl border-zinc-200 focus:border-emerald-500 focus:ring-emerald-500/20 bg-white transition-all shadow-sm hover:border-emerald-300" placeholder="Residential country" type="text" required />
+                </div>
+                <div class="space-y-2 group">
+                    <label class="font-bold text-sm text-zinc-700 group-focus-within:text-emerald-600 transition-colors">WhatsApp Number</label>
+                    <input class="w-full rounded-xl border-zinc-200 focus:border-emerald-500 focus:ring-emerald-500/20 bg-white transition-all shadow-sm hover:border-emerald-300" placeholder="+92 300 0000000" type="tel" required />
+                </div>
+                <div class="space-y-2 group">
+                    <label class="font-bold text-sm text-zinc-700 group-focus-within:text-emerald-600 transition-colors">Gender</label>
+                    <select class="w-full rounded-xl border-zinc-200 focus:border-emerald-500 focus:ring-emerald-500/20 bg-white transition-all shadow-sm hover:border-emerald-300 cursor-pointer">
+                        <option>Male</option>
+                        <option>Female</option>
+                    </select>
+                </div>
+                <div class="space-y-2">
+                    <label class="font-bold text-sm text-zinc-700">Selected Course</label>
+                    <input class="w-full rounded-xl border-emerald-200 bg-emerald-50/50 text-emerald-800 font-bold cursor-not-allowed" id="selected-course" readonly type="text" />
+                </div>
+                <div class="md:col-span-2 pt-2">
+                    <button class="w-full bg-secondary text-white font-extrabold py-4 rounded-xl shadow-lg shadow-secondary/30 hover:shadow-xl hover:shadow-secondary/40 hover:bg-amber-600 hover:-translate-y-1 active:translate-y-0 transition-all duration-300 text-lg flex justify-center items-center gap-2 group" type="submit">
+                        Submit via WhatsApp <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">send</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+const courses = [
+  { en:"Noorani Qaida",              ar:"القاعدة النورانية",              dur:"7 Months",  time:"30 min", note:"English / Arabic" },
+  { en:"Nazra Quran",                ar:"ناظرة القرآن الكريم",            dur:"5 Months",  time:"30 min", note:"" },
+  { en:"Hifz-e-Quran",               ar:"حفظ القرآن الكريم",              dur:"2 Years",   time:"50 min", note:"" },
+  { en:"Quran Revision (Manzil)",    ar:"مراجعة المنزل اليومي",           dur:"7 Months",  time:"50 min", note:"" },
+  { en:"Tajweed & Qirat",            ar:"التجويد والقراءات",              dur:"2 Years",   time:"50 min", note:"" },
+  { en:"Quran Translation",          ar:"ترجمة القرآن الكريم",            dur:"4 Months",  time:"30 min", note:"" },
+  { en:"Tafseer-e-Naeemi",           ar:"تفسير نعيمي",                    dur:"25 Months", time:"30 min", note:"" },
+  { en:"Tafseer Sirat-ul-Jinan",     ar:"تفسير صراط الجنان",              dur:"25 Months", time:"30 min", note:"" },
+  { en:"Dars-e-Nizami (8 Years)",    ar:"الدرس النظامي - ٨ سنوات",        dur:"8 Years",   time:"40 min", note:"" },
+  { en:"Dars-e-Nizami (5 Years)",    ar:"الدرس النظامي - ٥ سنوات",        dur:"5 Years",   time:"40 min", note:"" },
+  { en:"Tafseer Surah An-Noor",      ar:"تفسير سورة النور",               dur:"27 Days",   time:"30 min", note:"" },
+  { en:"Faizan-e-Chehl Hadith",      ar:"فيض أربعين حديثاً",              dur:"1 Month",   time:"30 min", note:"" },
+  { en:"Faizan-e-Shariat",           ar:"فيضان الشريعة",                  dur:"2 Years",   time:"30 min", note:"" },
+  { en:"Taharat Course (Adults)",    ar:"دورة الطهارة للكبار",            dur:"1 Month",   time:"30 min", note:"" },
+  { en:"Namaz Course (Adults)",      ar:"دورة الصلاة للكبار",             dur:"1 Month",   time:"30 min", note:"" },
+  { en:"Islamic Beliefs (Kids)",     ar:"العقيدة الإسلامية للأطفال",      dur:"25 Days",   time:"30 min", note:"" },
+  { en:"Shamail-e-Mustafa",          ar:"شمائل المصطفى ﷺ",                dur:"52 Days",   time:"30 min", note:"" },
+  { en:"Islamic Lifestyle",          ar:"الحياة الإسلامية",               dur:"1 Month",   time:"30 min", note:"" },
+  { en:"Farz Uloom Course",          ar:"دورة الفرائض",                   dur:"2 Months",  time:"30 min", note:"" },
+  { en:"Fiqh Course",                ar:"دورة الفقه الإسلامي",            dur:"20 Months", time:"40 min", note:"" },
+  { en:"Islah-e-Aamal",              ar:"إصلاح الأعمال",                  dur:"1 Month",   time:"30 min", note:"" },
+];
+
+const grid = document.getElementById('courses-grid');
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+requestAnimationFrame(() => document.body.classList.add('is-loaded'));
+
+const header = document.getElementById('site-header');
+function updateHeader() {
+  header.classList.toggle('nav-scrolled', window.scrollY > 12);
+}
+updateHeader();
+window.addEventListener('scroll', updateHeader, { passive: true });
+
+const cursorLight = document.getElementById('cursor-light');
+const finePointer = window.matchMedia('(pointer: fine)').matches;
+if (cursorLight && finePointer && !reduceMotion) {
+  let pointerX = window.innerWidth / 2;
+  let pointerY = window.innerHeight / 2;
+  let lightX = pointerX;
+  let lightY = pointerY;
+  let rafId = null;
+
+  function renderLight() {
+    lightX += (pointerX - lightX) * 0.12;
+    lightY += (pointerY - lightY) * 0.12;
+    cursorLight.style.transform = `translate3d(${lightX - 180}px, ${lightY - 180}px, 0)`;
+    rafId = requestAnimationFrame(renderLight);
+  }
+
+  window.addEventListener('pointermove', (e) => {
+    pointerX = e.clientX;
+    pointerY = e.clientY;
+    cursorLight.classList.add('active');
+    if (!rafId) renderLight();
+  }, { passive: true });
+
+  document.addEventListener('mouseleave', () => cursorLight.classList.remove('active'));
+  document.addEventListener('mouseenter', () => cursorLight.classList.add('active'));
+}
+
+// -----------------------------------------
+// MODAL LOGIC
+// -----------------------------------------
+const modal = document.getElementById('application-modal');
+const courseInput = document.getElementById('selected-course');
+
+function openModal(courseName) {
+    courseInput.value = courseName;
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+        closeModal();
+    }
+});
+
+document.getElementById('admission-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const inputs = this.querySelectorAll('input');
+    const name = inputs[0].value;
+    const fatherName = inputs[1].value;
+    const age = inputs[2].value;
+    const cnic = inputs[3].value;
+    const country = inputs[4].value;
+    const contact = inputs[5].value;
+    const gender = this.querySelector('select').value;
+    const course = courseInput.value;
+
+    const targetNumber = "923073741024";
+
+    const message = `*New Admission Inquiry*\n\n*Course:* ${course}\n-------------------------\n*Student:* ${name}\n*Father:* ${fatherName}\n*Age:* ${age}\n*Gender:* ${gender}\n*CNIC:* ${cnic}\n*Country:* ${country}\n*Contact:* ${contact}`;
+
+    window.open(`https://wa.me/${targetNumber}?text=${encodeURIComponent(message)}`, '_blank');
+
+    closeModal();
+    this.reset();
+});
+
+// -----------------------------------------
+// RENDERING CARDS
+// -----------------------------------------
+courses.forEach((c, i) => {
+  const delay = (i % 4) * 100;
+  const noteBadge = c.note
+    ? `<span class="text-[10px] text-amber-700 font-semibold bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">${c.note}</span>`
+    : '';
+  grid.innerHTML += `
+    <div class="premium-card bg-white/90 backdrop-blur-sm p-5 md:p-6 rounded-2xl md:rounded-3xl border border-zinc-100 shadow-sm hover:shadow-xl hover:-translate-y-2 hover:border-emerald-200 transition-all duration-500 flex flex-col justify-between group reveal" style="transition-delay:${delay}ms">
+      <div>
+        <div class="flex justify-between items-start mb-4">
+          <span class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white group-hover:rotate-12 group-hover:scale-110 transition-all duration-500 shadow-sm shrink-0">
+            <span class="material-symbols-outlined text-xl">menu_book</span>
+          </span>
+          ${noteBadge}
+        </div>
+        <h4 class="font-extrabold text-base mb-1 text-zinc-900 group-hover:text-emerald-700 transition-colors">${c.en}</h4>
+        <p class="arabic text-base text-emerald-700 font-bold mb-3">${c.ar}</p>
+        <div class="flex flex-wrap gap-2">
+          <span class="flex items-center gap-1 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold px-2.5 py-1 rounded-full">
+            <span class="material-symbols-outlined text-sm">calendar_month</span>${c.dur}
+          </span>
+          <span class="flex items-center gap-1 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-bold px-2.5 py-1 rounded-full">
+            <span class="material-symbols-outlined text-sm">schedule</span>${c.time} / class
+          </span>
+        </div>
+      </div>
+      <button class="premium-button w-full bg-emerald-50 text-emerald-700 font-bold py-3 rounded-xl hover:bg-emerald-600 hover:text-white mt-5 text-sm transition-all" onclick="openModal('${c.en}')" data-magnetic>
+        Apply Now
+      </button>
+    </div>`;
+});
+
+if (!reduceMotion) {
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('active');
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: "0px 0px -70px 0px" });
+
+  setTimeout(() => {
+    document.querySelectorAll('.reveal').forEach((el, index) => {
+      if (!el.style.transitionDelay) el.style.transitionDelay = `${Math.min(index % 6, 5) * 70}ms`;
+      obs.observe(el);
+    });
+  }, 80);
+} else {
+  document.querySelectorAll('.reveal').forEach(el => el.classList.add('active'));
+}
+
+if (finePointer && !reduceMotion) {
+  document.querySelectorAll('[data-magnetic]').forEach(el => {
+    el.addEventListener('pointermove', (e) => {
+      const rect = el.getBoundingClientRect();
+      const x = e.clientX - rect.left - rect.width / 2;
+      const y = e.clientY - rect.top - rect.height / 2;
+      el.style.transform = `translate3d(${x * 0.12}px, ${y * 0.18}px, 0)`;
+    });
+    el.addEventListener('pointerleave', () => {
+      el.style.transform = '';
+    });
+  });
+}
+
+function setNav(el) {
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.classList.remove('active','text-emerald-800'); item.classList.add('text-zinc-400');
+    const ic = item.querySelector('.material-symbols-outlined');
+    if (ic) ic.style.fontVariationSettings = "'FILL' 0";
+  });
+  el.classList.add('active','text-emerald-800'); el.classList.remove('text-zinc-400');
+  const ic = el.querySelector('.material-symbols-outlined');
+  if (ic) ic.style.fontVariationSettings = "'FILL' 1";
+}
+</script>
+</body>
+</html>
